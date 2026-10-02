@@ -3,9 +3,7 @@ import json, tempfile
 from pathlib import Path
 import pandas as pd
 import gradio as gr
-from dotenv import load_dotenv
 
-load_dotenv()
 from src.config import SETTINGS
 from src.data import validate_input, clean_input, merge_predictions, overview_metrics, reason_breakdown, product_summary
 from src.demo_classifier import classify_dataframe
