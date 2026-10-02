@@ -90,7 +90,7 @@ FIRST PASS: {json.dumps(first, ensure_ascii=False)}"""
         return obj.model_dump()
 
     def classify(self, df, progress=None):
-        records = df[["return_id","sku","product_name","category","size_ordered","return_reason_selected","other_comment"]].to_dict("records")
+        records = df[["return_id","sku","product_name","category","size_ordered","other_comment"]].to_dict("records")
         batches = [records[i:i+SETTINGS.batch_size] for i in range(0, len(records), SETTINGS.batch_size)]
         first = []
         with ThreadPoolExecutor(max_workers=SETTINGS.max_workers) as ex:

@@ -1,5 +1,5 @@
 from __future__ import annotations
-import json, tempfile
+import json, os, socket, tempfile
 from pathlib import Path
 import pandas as pd
 import gradio as gr
@@ -65,6 +65,14 @@ def _demo_insight(result):
     issue = subset['ai_sub_reason'].value_counts().head(2)
     evidence = ", ".join([f"{k}: {v}" for k,v in issue.items()])
     return {"headline":f"{top['sku']} shows the strongest fit concentration in this run.","recommended_action":f"Review the size chart and vendor measurements for {top['sku']} before the next restock.","evidence":evidence or f"{len(subset)} classified returns."}
+
+def _gradio_port():
+    configured_port = os.getenv("GRADIO_SERVER_PORT")
+    if configured_port:
+        return int(configured_port)
+    with socket.socket() as sock:
+        sock.bind(("0.0.0.0", 0))
+        return sock.getsockname()[1]
 
 def run_analysis(df, progress=gr.Progress()):
     if df is None or len(df) == 0:
@@ -151,4 +159,4 @@ with gr.Blocks(title="Dhaga Returns Intelligence") as demo:
     run_btn.click(run_analysis, inputs=state_input, outputs=[state_result, metrics_html, reasons_table, attention, analysis_table, review_table, product_table, insight_box, tech, export])
 
 if __name__ == "__main__":
-    demo.queue(default_concurrency_limit=4).launch(server_name="0.0.0.0", server_port=7860, max_file_size="10mb", css=CSS)
+    demo.queue(default_concurrency_limit=4).launch(server_name="0.0.0.0", server_port=_gradio_port(), max_file_size="10mb", css=CSS)
